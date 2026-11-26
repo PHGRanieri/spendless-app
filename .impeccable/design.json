@@ -1,0 +1,383 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-26T06:21:00.620Z",
+  "title": "Design System: $pendless",
+  "extensions": {
+    "colorMeta": {
+      "broto": {
+        "role": "primary",
+        "displayName": "Broto",
+        "canonical": "#16A34A",
+        "tonalRamp": [
+          "#052e16",
+          "#14532d",
+          "#166534",
+          "#15803d",
+          "#16a34a",
+          "#22c55e",
+          "#86efac",
+          "#dcfce7"
+        ]
+      },
+      "floresta": {
+        "role": "primary",
+        "displayName": "Floresta",
+        "canonical": "#14532D",
+        "tonalRamp": [
+          "#052e16",
+          "#14532d",
+          "#166534",
+          "#15803d",
+          "#16a34a",
+          "#22c55e",
+          "#86efac",
+          "#dcfce7"
+        ]
+      },
+      "orvalho": {
+        "role": "primary",
+        "displayName": "Orvalho",
+        "canonical": "#DCFCE7",
+        "tonalRamp": [
+          "#052e16",
+          "#14532d",
+          "#166534",
+          "#15803d",
+          "#16a34a",
+          "#22c55e",
+          "#86efac",
+          "#dcfce7"
+        ]
+      },
+      "mel": {
+        "role": "secondary",
+        "displayName": "Mel",
+        "canonical": "#D97706",
+        "tonalRamp": [
+          "#451a03",
+          "#78350f",
+          "#92400e",
+          "#b45309",
+          "#d97706",
+          "#f59e0b",
+          "#fcd34d",
+          "#fef3c7"
+        ]
+      },
+      "brasa": {
+        "role": "secondary",
+        "displayName": "Brasa",
+        "canonical": "#DC2626",
+        "tonalRamp": [
+          "#450a0a",
+          "#7f1d1d",
+          "#991b1b",
+          "#b91c1c",
+          "#dc2626",
+          "#ef4444",
+          "#fca5a5",
+          "#fee2e2"
+        ]
+      },
+      "fundo-linho": {
+        "role": "neutral",
+        "displayName": "Fundo Linho",
+        "canonical": "#F8FAF9",
+        "tonalRamp": [
+          "#020617",
+          "#0f172a",
+          "#1e293b",
+          "#334155",
+          "#64748b",
+          "#cbd5e1",
+          "#e2e8f0",
+          "#f8faf9"
+        ]
+      },
+      "louca": {
+        "role": "neutral",
+        "displayName": "Louça",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#020617",
+          "#0f172a",
+          "#1e293b",
+          "#334155",
+          "#64748b",
+          "#cbd5e1",
+          "#e2e8f0",
+          "#ffffff"
+        ]
+      },
+      "tinta": {
+        "role": "neutral",
+        "displayName": "Tinta",
+        "canonical": "#0F172A",
+        "tonalRamp": [
+          "#020617",
+          "#0f172a",
+          "#1e293b",
+          "#334155",
+          "#64748b",
+          "#cbd5e1",
+          "#e2e8f0",
+          "#f8fafc"
+        ]
+      },
+      "ardosia": {
+        "role": "neutral",
+        "displayName": "Ardósia",
+        "canonical": "#64748B",
+        "tonalRamp": [
+          "#020617",
+          "#0f172a",
+          "#1e293b",
+          "#334155",
+          "#64748b",
+          "#cbd5e1",
+          "#e2e8f0",
+          "#f8fafc"
+        ]
+      },
+      "nevoa": {
+        "role": "neutral",
+        "displayName": "Névoa",
+        "canonical": "#E2E8F0",
+        "tonalRamp": [
+          "#020617",
+          "#0f172a",
+          "#1e293b",
+          "#334155",
+          "#64748b",
+          "#cbd5e1",
+          "#e2e8f0",
+          "#f8fafc"
+        ]
+      },
+      "mel-tostado": {
+        "role": "secondary",
+        "displayName": "Mel Tostado",
+        "canonical": "#92400E",
+        "tonalRamp": [
+          "#451a03",
+          "#78350f",
+          "#92400e",
+          "#b45309",
+          "#d97706",
+          "#f59e0b",
+          "#fcd34d",
+          "#fef3c7"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Somente o nome $pendless no cabeçalho."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Valor do saldo atual no cartão Floresta."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Títulos de seção, cartões e estados vazios."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Textos de apoio, nomes de tipo e campos."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Rótulos de campos e totais."
+      },
+      "amount": {
+        "displayName": "Amount",
+        "purpose": "Todo valor em R$, colorido por status."
+      },
+      "pill": {
+        "displayName": "Pill",
+        "purpose": "Texto das pílulas de status."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ambiente-leve",
+        "value": "0 3px 10px rgba(20,83,45,0.07)",
+        "purpose": "Cartões, linhas de item, seletor de mês e estado vazio. Android: elevation 2."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "purpose": "Curva padrão de todas as animações."
+      },
+      {
+        "name": "press-pill",
+        "value": "scale 0.96 / 100ms, spring tension 300 friction 20",
+        "purpose": "Toque na pílula de status."
+      },
+      {
+        "name": "press-button",
+        "value": "scale 0.97 / 120ms in, 160ms out",
+        "purpose": "Toque em botões."
+      },
+      {
+        "name": "progress",
+        "value": "width / 240ms ease-out",
+        "purpose": "Barra de progresso quando o valor muda no mesmo mês."
+      },
+      {
+        "name": "list-change",
+        "value": "LayoutAnimation opacity / 200ms easeInEaseOut",
+        "purpose": "Incluir ou excluir item."
+      },
+      {
+        "name": "empty-enter",
+        "value": "opacity + translateY 8px / 320ms; emoji spring friction 7, delay 60ms",
+        "purpose": "Entrada única do estado vazio."
+      },
+      {
+        "name": "dialog",
+        "value": "backdrop fade + card scale 0.96→1 / 220ms ease-out; exit 140ms",
+        "purpose": "Diálogo de confirmação."
+      }
+    ],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação principal (Salvar, Exportar, + Nova entrada).",
+      "html": "<button class=\"ds-btn-primary\">Salvar</button>",
+      "css": ".ds-btn-primary { background: #14532D; color: #FFFFFF; font-family: Nunito, system-ui, sans-serif; font-weight: 700; font-size: 16px; padding: 14px 16px; border: none; border-radius: 12px; min-width: 220px; transition: transform 160ms cubic-bezier(0.23,1,0.32,1); } .ds-btn-primary:active { transform: scale(0.97); transition-duration: 120ms; } .ds-btn-primary:focus-visible { outline: 2px solid #14532D; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ação alternativa (Importar, ação do estado vazio).",
+      "html": "<button class=\"ds-btn-secondary\">Importar</button>",
+      "css": ".ds-btn-secondary { background: #FFFFFF; color: #14532D; font-family: Nunito, system-ui, sans-serif; font-weight: 700; font-size: 16px; padding: 14px 16px; border: 1px solid #E2E8F0; border-radius: 12px; min-width: 220px; transition: transform 160ms cubic-bezier(0.23,1,0.32,1); } .ds-btn-secondary:active { transform: scale(0.97); } .ds-btn-secondary:focus-visible { outline: 2px solid #16A34A; outline-offset: 2px; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Excluir item.",
+      "html": "<button class=\"ds-btn-danger\">Excluir</button>",
+      "css": ".ds-btn-danger { background: #FFFFFF; color: #DC2626; font-family: Nunito, system-ui, sans-serif; font-weight: 700; font-size: 16px; padding: 14px 16px; border: 1px solid #DC2626; border-radius: 12px; min-width: 220px; transition: transform 160ms cubic-bezier(0.23,1,0.32,1); } .ds-btn-danger:active { transform: scale(0.97); } .ds-btn-danger:focus-visible { outline: 2px solid #DC2626; outline-offset: 2px; }"
+    },
+    {
+      "name": "Status Pills",
+      "kind": "chip",
+      "refersTo": "status-pill-done",
+      "description": "Alterna pago/não pago e recebida/não recebida.",
+      "html": "<div class=\"ds-pills\"><button class=\"ds-pill ds-pill-done\">✓ Pago</button><button class=\"ds-pill ds-pill-pending\">○ Não pago</button></div>",
+      "css": ".ds-pills { display: flex; gap: 8px; } .ds-pill { font-family: Nunito, system-ui, sans-serif; font-weight: 700; font-size: 12px; padding: 6px 12px; border: none; border-radius: 999px; transition: transform 160ms cubic-bezier(0.23,1,0.32,1); } .ds-pill:active { transform: scale(0.96); transition-duration: 100ms; } .ds-pill-done { background: #DCFCE7; color: #14532D; } .ds-pill-pending { background: rgba(217,119,6,0.12); color: #92400E; } .ds-pill:focus-visible { outline: 2px solid #16A34A; outline-offset: 2px; }"
+    },
+    {
+      "name": "Confirmation Dialog",
+      "kind": "custom",
+      "refersTo": "dialog",
+      "description": "Confirmação de exclusão e de escolhas importantes.",
+      "html": "<div class=\"ds-dlg\"><div class=\"ds-dlg-badge\">🗑️</div><div class=\"ds-dlg-title\">Excluir gasto?</div><div class=\"ds-dlg-msg\">\"Feira da semana\" sai deste mês. Isso não pode ser desfeito.</div><button class=\"ds-dlg-danger\">Excluir gasto</button><button class=\"ds-dlg-cancel\">Cancelar</button></div>",
+      "css": ".ds-dlg { background: #FFFFFF; border-radius: 24px; padding: 24px 24px 12px; width: 320px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 3px 10px rgba(20,83,45,0.07); font-family: Nunito, system-ui, sans-serif; } .ds-dlg-badge { width: 64px; height: 64px; border-radius: 999px; background: rgba(220,38,38,0.1); display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 8px; } .ds-dlg-title { font-size: 20px; font-weight: 800; color: #0F172A; } .ds-dlg-msg { font-size: 15px; line-height: 22px; color: #64748B; text-align: center; margin-bottom: 16px; } .ds-dlg-danger, .ds-dlg-cancel { align-self: stretch; min-height: 48px; border-radius: 12px; border: none; font: 700 16px Nunito, system-ui, sans-serif; transition: transform 160ms cubic-bezier(0.23,1,0.32,1); } .ds-dlg-danger { background: #DC2626; color: #FFFFFF; } .ds-dlg-cancel { background: transparent; color: #64748B; } .ds-dlg-danger:active, .ds-dlg-cancel:active { transform: scale(0.97); } .ds-dlg-danger:focus-visible, .ds-dlg-cancel:focus-visible { outline: 2px solid #14532D; outline-offset: 2px; }"
+    },
+    {
+      "name": "Item Row",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Linha de item com emoji do tipo, nome, subtítulo, valor e status.",
+      "html": "<div class=\"ds-row\"><span class=\"ds-badge\">🛒</span><div class=\"ds-row-mid\"><div class=\"ds-row-title\">Feira da semana</div><div class=\"ds-row-sub\">Mercado · Pix · vence 12/11</div></div><div class=\"ds-row-right\"><span class=\"ds-amount\">R$ 150,75</span><span class=\"ds-pill-p\">○ Não pago</span></div></div>",
+      "css": ".ds-row { display: flex; align-items: center; gap: 12px; background: #FFFFFF; border-radius: 12px; padding: 12px; box-shadow: 0 3px 10px rgba(20,83,45,0.07); font-family: Nunito, system-ui, sans-serif; width: 340px; } .ds-badge { width: 40px; height: 40px; border-radius: 999px; background: rgba(22,163,74,0.14); display: flex; align-items: center; justify-content: center; font-size: 20px; } .ds-row-mid { flex: 1; } .ds-row-title { font-weight: 700; font-size: 15px; color: #0F172A; } .ds-row-sub { font-size: 12px; color: #64748B; margin-top: 2px; } .ds-row-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; } .ds-amount { font-weight: 700; font-size: 16px; color: #DC2626; font-variant-numeric: tabular-nums; } .ds-pill-p { font-weight: 700; font-size: 12px; padding: 6px 12px; border-radius: 999px; background: rgba(217,119,6,0.12); color: #92400E; }"
+    },
+    {
+      "name": "Hero Balance Card",
+      "kind": "custom",
+      "refersTo": "hero-card",
+      "description": "Cartão do saldo atual no Resumo.",
+      "html": "<div class=\"ds-hero\"><div class=\"ds-hero-label\">Saldo atual</div><div class=\"ds-hero-value\">R$ 3.482,90</div><div class=\"ds-hero-hint\">entradas recebidas − gastos pagos</div><hr class=\"ds-hero-hr\"><div class=\"ds-hero-row\"><span class=\"ds-hero-label\">Previsto no fim do mês</span><span class=\"ds-hero-fc\">R$ 1.210,40</span></div></div>",
+      "css": ".ds-hero { background: #14532D; color: #FFFFFF; border-radius: 12px; padding: 24px; width: 320px; font-family: Nunito, system-ui, sans-serif; } .ds-hero-label { color: rgba(255,255,255,0.75); font-size: 14px; font-weight: 600; } .ds-hero-value { font-size: 38px; font-weight: 800; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; margin-top: 4px; } .ds-hero-hint { color: rgba(255,255,255,0.75); font-size: 12px; } .ds-hero-hr { border: none; height: 1px; background: rgba(255,255,255,0.15); margin: 16px 0; } .ds-hero-row { display: flex; justify-content: space-between; align-items: center; } .ds-hero-fc { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo de texto e de valor em R$.",
+      "html": "<input class=\"ds-input\" value=\"R$ 1.234,56\" />",
+      "css": ".ds-input { background: #FFFFFF; color: #0F172A; border: 1px solid #E2E8F0; border-radius: 12px; padding: 12px; font-family: Nunito, system-ui, sans-serif; font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; width: 280px; } .ds-input:focus-visible { outline: none; border-color: #16A34A; }"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-active",
+      "description": "Barra inferior com 5 abas; ativa em pílula Orvalho.",
+      "html": "<nav class=\"ds-tabs\"><a class=\"ds-tab ds-on\"><span class=\"ds-ic\">🏡</span>Resumo</a><a class=\"ds-tab\"><span class=\"ds-ic\">💰</span>Entradas</a><a class=\"ds-tab\"><span class=\"ds-ic\">📌</span>Fixos</a><a class=\"ds-tab\"><span class=\"ds-ic\">🛍️</span>Variáveis</a><a class=\"ds-tab\"><span class=\"ds-ic\">⚙️</span>Ajustes</a></nav>",
+      "css": ".ds-tabs { display: flex; background: #FFFFFF; border-top: 1px solid #E2E8F0; padding: 8px 0; width: 360px; font-family: Nunito, system-ui, sans-serif; } .ds-tab { flex: 1; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 500; color: #64748B; cursor: pointer; } .ds-ic { font-size: 20px; padding: 4px 16px; border-radius: 999px; margin-bottom: 2px; opacity: 0.55; } .ds-on { color: #14532D; font-weight: 800; } .ds-on .ds-ic { background: #DCFCE7; opacity: 1; } .ds-tab:focus-visible { outline: 2px solid #16A34A; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "A Cozinha Arrumada",
+    "overview": "O $pendless é uma cozinha arrumada: tudo tem seu lugar, cada coisa tem sua cor, e o ambiente é quente sem ser bagunçado. O usuário entra várias vezes por mês para uma tarefa curta (marcar uma conta como paga, lançar uma compra, conferir o saldo) e precisa achar tudo onde deixou. O aconchego vem dos detalhes: a Nunito arredondada, um emoji para cada categoria, pílulas macias e frases gentis. Não vem de enfeite.\n\nA densidade é de app de uso diário: um mês por tela, cartões brancos sobre fundo linho, números grandes e alinhados. A cor trabalha: verde para o que entrou ou já foi pago, âmbar para o que está pendente, vermelho para saídas. O único momento de peso visual é o cartão do saldo atual, em verde floresta, a \"bancada principal\" da cozinha.\n\nIdentidade única em iOS e Android: o visual é do $pendless, não do sistema. As convenções nativas valem para o comportamento (margens seguras, teclado, gesto de voltar, compartilhar, movimento reduzido).",
+    "keyCharacteristics": [
+      "Fundo linho claro, cartões de louça branca com sombra leve e cantos de 12px.",
+      "Nunito em quatro pesos, com números tabulares em todos os valores.",
+      "Um emoji em círculo tingido por categoria: a \"etiqueta do pote\".",
+      "Cor com função: verde concluído, âmbar pendente, vermelho saída.",
+      "Movimento só como resposta ao toque ou para evitar saltos; nunca decorativo em dados."
+    ],
+    "rules": [
+      {
+        "name": "The Readable Green Rule",
+        "body": "Texto pequeno e texto sobre botão nunca usam Broto: usam Floresta. Todo texto passa de 4,5:1 (grande, 3:1).",
+        "section": "colors"
+      },
+      {
+        "name": "The Tint, Not New Hue Rule",
+        "body": "Cores novas não entram. Fundos suaves são a própria cor oficial com opacidade (10–15%), nunca um tom inventado. Isso vale para os círculos dos emojis, as pílulas pendentes e as trilhas das barras.",
+        "section": "colors"
+      },
+      {
+        "name": "The Color Means Status Rule",
+        "body": "Verde sempre significa recebido/pago ou positivo, âmbar sempre pendente, vermelho sempre saída ou negativo. Nenhuma dessas cores é usada só para enfeitar.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Family Rule",
+        "body": "Só a Nunito. A hierarquia vem de peso e tamanho, nunca de uma segunda fonte.",
+        "section": "typography"
+      },
+      {
+        "name": "The Weight Maps to File Rule",
+        "body": "O peso é resolvido para o arquivo da fonte (Nunito-Regular, -SemiBold, -Bold, -ExtraBold) pelo componente Text do app. Nunca use o Text puro do React Native.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Heavy Shadow Rule",
+        "body": "Nenhuma sombra passa de 0.08 de opacidade, e não existem gradientes. Se algo precisa de mais destaque, ganha cor, não sombra.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do usar as cores oficiais e os tints delas (10–15%) para fundos suaves.",
+      "Do confirmar exclusões com o diálogo de confirmação do app, nunca com o alerta do sistema.",
+      "Do escrever todo valor em R$ com o componente de valor (peso 700, tabular), colorido por status: Broto entradas, Brasa saídas, Tinta neutro.",
+      "Do dar a toda categoria nova um emoji e uma cor-base oficial em src/typeIcons.ts.",
+      "Do usar cantos de 12px em blocos e pílula totalmente arredondada em status, chips e seletores.",
+      "Do manter animações curtas (100–320ms) e respeitar o Reduzir Movimento do sistema.",
+      "Do usar frases gentis nos estados vazios e nos textos de apoio (\"Nada por aqui ainda 🌱\")."
+    ],
+    "donts": [
+      "Don't usar gradientes ou sombras acima de 0.08 de opacidade.",
+      "Don't introduzir cores fora da paleta, uma segunda família de fonte ou modo escuro.",
+      "Don't animar troca de abas, troca de mês ou números de saldo: são navegação frequente e dados que o usuário lê.",
+      "Don't usar vermelho como fundo de tela ou de cartão grande; o negativo aparece como selo ou pílula.",
+      "Don't adotar o visual Material ou Cupertino por plataforma: a identidade é única nos dois sistemas.",
+      "Don't usar o Text ou o TextInput puros do React Native; use os de src/components/Text.tsx."
+    ]
+  }
+}
