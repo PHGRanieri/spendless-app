@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import { Alert } from 'react-native';
+import { notify } from './components/dialogs';
 import type { Db } from './db/adapter';
 import { listMonths } from './domain/repo';
 import { UserError } from './domain/types';
@@ -49,7 +49,7 @@ export function AppProvider({ db, children }: { db: Db; children: React.ReactNod
         fn();
         return true;
       } catch (e) {
-        Alert.alert('Não foi possível salvar', errorMessage(e));
+        void notify('error', 'Não foi possível salvar', errorMessage(e));
         return false;
       } finally {
         setVersion((v) => v + 1);

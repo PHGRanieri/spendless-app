@@ -3,7 +3,7 @@ import { Text } from '../components/Text';
 import { useApp } from '../AppContext';
 import { animateNextLayout } from '../motion';
 import { INCOME_TYPES, Recurrence } from '../constants';
-import { shortDateLabel } from '../dates';
+import { monthLabel, shortDateLabel } from '../dates';
 import { addIncome, deleteIncome, toggleIncomeReceived, updateIncome } from '../domain/items';
 import { listIncomes } from '../domain/repo';
 import type { EditScope, Income } from '../domain/types';
@@ -13,6 +13,7 @@ import { Button, DayGrid, Field, FormModal, MoneyField, Segmented, SelectField, 
 import { colors, common, roles, tints } from '../theme';
 import { ListLayout } from './ListLayout';
 import { defaultDate, today } from './formDefaults';
+import { clearError, FieldErrors, FieldKey, hasErrors, validateItemForm } from './validation';
 
 interface Form {
   id: number | null;
@@ -33,18 +34,33 @@ export function IncomesScreen() {
   const { db, month, version, run } = useApp();
   const items = useMemo(() => listIncomes(db, month), [db, month, version]);
   const [form, setForm] = useState<Form | null>(null);
+  const [errors, setErrors] = useState<FieldErrors>({});
+
+  /** Atualiza o formulário e apaga o erro do campo mexido. */
+  const edit = (patch: Partial<Form>, key?: FieldKey) => {
+    if (!form) return;
+    setForm({ ...form, ...patch });
+    if (key) setErrors((e) => clearError(e, key));
+  };
   const editing = items.find((i) => i.id === form?.id) ?? null;
 
   const received = items.filter((i) => i.received).reduce((a, i) => a + i.amountCents, 0);
   const total = items.reduce((a, i) => a + i.amountCents, 0);
 
-  const openNew = () =>
+  const openNew = () => {
+    setErrors({});
     setForm({ id: null, type: null, name: '', cents: 0, date: defaultDate(month), recurrence: 'fixa', note: '' });
-  const openEdit = (i: Income) =>
+  };
+  const openEdit = (i: Income) => {
+    setErrors({});
     setForm({ id: i.id, type: i.type, name: i.name, cents: i.amountCents, date: i.date, recurrence: i.recurrence, note: i.note ?? '' });
+  };
 
   const save = async () => {
     if (!form) return;
+    const found = validateItemForm(form);
+    setErrors(found);
+    if (hasErrors(found)) return;
     const input = { type: form.type ?? '', name: form.name, amountCents: form.cents, date: form.date, note: form.note };
     if (form.id == null) {
       if (run(() => { addIncome(db, month, { ...input, recurrence: form.recurrence }, today()); animateNextLayout(); })) setForm(null);
@@ -108,6 +124,9 @@ export function IncomesScreen() {
         <FormModal
           visible
           title={form.id == null ? 'Nova entrada' : 'Editar entrada'}
+          subtitle={monthLabel(month)}
+          emoji="💰"
+          type={form.type}
           onClose={() => setForm(null)}
           footer={
             <>
@@ -116,14 +135,14 @@ export function IncomesScreen() {
             </>
           }
         >
-          <Field label="Tipo">
-            <SelectField value={form.type} options={INCOME_TYPES} onChange={(type) => setForm({ ...form, type })} />
+          <Field label="Tipo" error={errors.type}>
+            <SelectField value={form.type} options={INCOME_TYPES} onChange={(type) => edit({ type }, 'type')} />
           </Field>
-          <Field label="Nome">
-            <TextField value={form.name} onChangeText={(name) => setForm({ ...form, name })} placeholder="Ex.: Salário empresa" maxLength={80} />
+          <Field label="Nome" error={errors.name}>
+            <TextField value={form.name} onChangeText={(name) => edit({ name }, 'name')} placeholder="Ex.: Salário empresa" maxLength={80} />
           </Field>
-          <Field label="Valor">
-            <MoneyField cents={form.cents} onChange={(cents) => setForm({ ...form, cents })} />
+          <Field label="Valor" error={errors.cents}>
+            <MoneyField cents={form.cents} onChange={(cents) => edit({ cents }, 'cents')} />
           </Field>
           <Field label="Repetição">
             <Segmented

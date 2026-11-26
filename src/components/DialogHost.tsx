@@ -126,10 +126,11 @@ function DialogButton({ action, onPress }: { action: DialogAction; onPress: () =
 
 const BUTTON_STYLES = {
   primary: { box: { backgroundColor: roles.action }, text: { color: roles.onAction } },
-  secondary: { box: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }, text: { color: colors.primaryDark } },
-  // Brasa com texto branco: 4,83:1.
+  secondary: { box: { backgroundColor: colors.softAccent }, text: { color: colors.primaryDark } },
+  // Brasa com texto branco: 4,83:1. O vermelho cheio fica só para a ação mais forte.
   danger: { box: { backgroundColor: colors.expense }, text: { color: colors.surface } },
-  'danger-outline': { box: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.expense }, text: { color: colors.expense } },
+  // Tonal: tint de Brasa com Brasa Tostada (5,5:1).
+  'danger-soft': { box: { backgroundColor: tint(colors.expense, 0.1) }, text: { color: colors.expenseText } },
   cancel: { box: { backgroundColor: 'transparent' }, text: { color: colors.textSecondary } },
 } as const;
 

@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   FlatList,
   KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,7 +13,7 @@ import {
 import { EASE_OUT, usePressScale, useReducedMotion } from '../motion';
 import { Text, TextInput } from './Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, common, radius, roles, space, tabular, tints } from '../theme';
+import { colors, common, radius, roles, space, tabular, tint, tints } from '../theme';
 import { iconBg, iconFor } from '../typeIcons';
 import { centsFromMaskedInput, formatBRL } from '../money';
 import { daysInMonth, firstWeekday, monthLabel } from '../dates';
@@ -30,8 +31,10 @@ export function Button({
   variant?: 'primary' | 'secondary' | 'danger';
   disabled?: boolean;
 }) {
-  const bg = variant === 'primary' ? roles.action : colors.surface;
-  const fg = variant === 'primary' ? roles.onAction : variant === 'danger' ? colors.expense : colors.primaryDark;
+  // Escada de peso: primário Floresta cheio; secundário tonal Orvalho; perigo tonal Brasa.
+  // O vermelho cheio fica para a confirmação final, no diálogo.
+  const bg = variant === 'primary' ? roles.action : variant === 'danger' ? tints.red : colors.softAccent;
+  const fg = variant === 'primary' ? roles.onAction : variant === 'danger' ? colors.expenseText : colors.primaryDark;
   // Encolhe para 97% ao encostar (120ms) e volta ao soltar (160ms).
   const press = usePressScale({ to: 0.97, inMs: 120, release: { type: 'timing', ms: 160 } });
   const reduced = useReducedMotion();
@@ -46,7 +49,6 @@ export function Button({
         style={({ pressed }) => [
           styles.button,
           { backgroundColor: bg, opacity: disabled ? 0.5 : reduced && pressed ? 0.8 : 1 },
-          variant !== 'primary' && { borderWidth: 1, borderColor: variant === 'danger' ? colors.expense : colors.border },
         ]}
       >
         <Text style={[styles.buttonText, { color: fg }]}>{title}</Text>
@@ -151,27 +153,55 @@ export function TypeBadge({ type, size = 40 }: { type: string; size?: number }) 
 
 /* ---------- Campos ---------- */
 
-export function Field({ label, children }: { label: string; children: React.ReactNode }) {
+/** Campo com erro: os controles de dentro pintam a borda de Brasa. */
+const FieldInvalid = createContext(false);
+
+/** Borda do campo: Brasa com erro, Floresta em foco, Névoa em repouso. */
+function useFieldBorder() {
+  const invalid = useContext(FieldInvalid);
+  const [focused, setFocused] = useState(false);
+  const borderColor = invalid ? colors.expense : focused ? colors.primaryDark : colors.border;
+  return { invalid, borderColor, onFocus: () => setFocused(true), onBlur: () => setFocused(false) };
+}
+
+export function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <View style={{ marginBottom: space.lg }}>
       <Text style={common.label}>{label}</Text>
-      {children}
+      <FieldInvalid.Provider value={!!error}>{children}</FieldInvalid.Provider>
+      {error ? (
+        <Text accessibilityRole="alert" accessibilityLiveRegion="polite" style={styles.fieldError}>
+          {error}
+        </Text>
+      ) : null}
     </View>
   );
 }
 
 export function TextField(props: React.ComponentProps<typeof TextInput>) {
-  return <TextInput placeholderTextColor={colors.textSecondary} {...props} style={[styles.input, props.style]} />;
+  const border = useFieldBorder();
+  return (
+    <TextInput
+      placeholderTextColor={colors.textSecondary}
+      {...props}
+      onFocus={(e) => { border.onFocus(); props.onFocus?.(e); }}
+      onBlur={(e) => { border.onBlur(); props.onBlur?.(e); }}
+      style={[styles.input, border.invalid && styles.inputInvalid, { borderColor: border.borderColor }, props.style]}
+    />
+  );
 }
 
 /** Valor em R$: o usuário digita só números, que preenchem os centavos da direita para a esquerda. */
 export function MoneyField({ cents, onChange }: { cents: number; onChange: (c: number) => void }) {
+  const border = useFieldBorder();
   return (
     <TextInput
-      style={[styles.input, styles.money]}
+      style={[styles.input, styles.money, border.invalid && styles.inputInvalid, { borderColor: border.borderColor }]}
       keyboardType="number-pad"
       value={formatBRL(cents)}
       onChangeText={(t) => onChange(centsFromMaskedInput(t))}
+      onFocus={border.onFocus}
+      onBlur={border.onBlur}
       selectTextOnFocus={false}
       accessibilityLabel="Valor"
     />
@@ -186,9 +216,14 @@ export function SelectField({ value, options, onChange, placeholder = 'Selecione
   placeholder?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const { invalid, borderColor } = useFieldBorder();
   return (
     <>
-      <Pressable style={[styles.input, styles.select]} onPress={() => setOpen(true)} accessibilityRole="button">
+      <Pressable
+        style={[styles.input, styles.select, invalid && styles.inputInvalid, { borderColor: open ? colors.primaryDark : borderColor }]}
+        onPress={() => setOpen(true)}
+        accessibilityRole="button"
+      >
         <View style={styles.optionLeft}>
           {value && <TypeBadge type={value} size={28} />}
           <Text style={value ? common.body : common.muted}>{value ?? placeholder}</Text>
@@ -316,15 +351,24 @@ export function DayGrid({ month, value, onChange, minDate }: {
 
 /* ---------- Estrutura ---------- */
 
-/** Formulário em tela cheia (modal) com rolagem e teclado tratado nas duas plataformas. */
-export function FormModal({ visible, title, onClose, children, footer }: {
+/**
+ * Formulário em tela cheia (modal) com rolagem e teclado tratado nas duas plataformas.
+ * O cabeçalho mora no linho, com a "etiqueta do pote": o emoji do tipo escolhido
+ * (ou o da seção, antes da escolha). O rodapé é uma bancada de louça com cantos de 24px.
+ */
+export function FormModal({ visible, title, subtitle, emoji, type, onClose, children, footer }: {
   visible: boolean;
   title: string;
+  subtitle?: string;
+  /** Emoji da seção, usado enquanto nenhum tipo foi escolhido. */
+  emoji: string;
+  type?: string | null;
   onClose: () => void;
   children: React.ReactNode;
   footer: React.ReactNode;
 }) {
   const insets = useSafeAreaInsets();
+  const closePress = usePressScale({ to: 0.92, inMs: 100, release: { type: 'spring', tension: 300, friction: 20 } });
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="fullScreen" onRequestClose={onClose}>
       <KeyboardAvoidingView
@@ -334,13 +378,33 @@ export function FormModal({ visible, title, onClose, children, footer }: {
         // não compensa em dobro quando o sistema já redimensionou.
         behavior="padding"
       >
-        <View style={[styles.modalHeader, { paddingTop: insets.top + space.md }]}>
-          <Text style={common.title} accessibilityRole="header">{title}</Text>
-          <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button">
-            <Text style={{ color: colors.primaryDark, fontSize: 16, fontWeight: '700' }}>Fechar</Text>
-          </Pressable>
+        <View style={[styles.modalHeader, { paddingTop: insets.top + space.lg }]}>
+          {type ? (
+            <TypeBadge type={type} size={48} />
+          ) : (
+            <View style={styles.modalBadge} accessible={false} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
+              <Text allowFontScaling={false} style={{ fontSize: 24 }}>{emoji}</Text>
+            </View>
+          )}
+          <View style={{ flex: 1 }}>
+            <Text style={styles.modalTitle} accessibilityRole="header" numberOfLines={1}>{title}</Text>
+            {subtitle ? <Text style={common.muted} numberOfLines={1}>{subtitle}</Text> : null}
+          </View>
+          <Animated.View style={closePress.style}>
+            <Pressable
+              onPress={onClose}
+              onPressIn={closePress.onPressIn}
+              onPressOut={closePress.onPressOut}
+              hitSlop={6}
+              accessibilityRole="button"
+              accessibilityLabel="Fechar"
+              style={styles.modalClose}
+            >
+              <Text allowFontScaling={false} style={styles.modalCloseText}>✕</Text>
+            </Pressable>
+          </Animated.View>
         </View>
-        <ScrollView contentContainerStyle={{ padding: space.lg }} keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerStyle={{ padding: space.lg, paddingTop: space.sm }} keyboardShouldPersistTaps="handled">
           {children}
         </ScrollView>
         <View style={[styles.modalFooter, { paddingBottom: insets.bottom + space.md }]}>{footer}</View>
@@ -407,14 +471,17 @@ export function Empty({ emoji = '🌱', title, text, actionLabel, onAction }: {
 }
 
 const styles = StyleSheet.create({
+  // Sem flex aqui: quem divide a largura é o Animated.View de fora. Com flex: 1 dentro de um
+  // pai de altura automática, o Yoga zera a altura do conteúdo e o Android corta o texto.
   button: {
     borderRadius: radius,
-    paddingVertical: 14,
+    minHeight: 48,
+    paddingVertical: 12,
     paddingHorizontal: space.lg,
     alignItems: 'center',
-    flex: 1,
+    justifyContent: 'center',
   },
-  buttonText: { fontSize: 16, fontWeight: '600' },
+  buttonText: { fontSize: 16, fontWeight: '700' },
   pill: { borderRadius: 999, paddingVertical: 6, paddingHorizontal: 12 },
   pillText: { fontSize: 12, fontWeight: '700' },
   optionLeft: { flexDirection: 'row', alignItems: 'center', gap: space.md },
@@ -441,7 +508,7 @@ const styles = StyleSheet.create({
   money: { ...tabular, fontSize: 20, fontWeight: '600' },
   select: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   backdrop: { flex: 1, backgroundColor: 'rgba(15,23,42,0.35)', justifyContent: 'center', padding: space.xl },
-  sheet: { backgroundColor: colors.surface, borderRadius: radius, maxHeight: '75%', paddingVertical: space.sm },
+  sheet: { backgroundColor: colors.surface, borderRadius: radius * 2, maxHeight: '75%', paddingVertical: space.sm },
   option: {
     paddingVertical: 14,
     paddingHorizontal: space.lg,
@@ -467,23 +534,45 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row' },
   cell: { flex: 1, aspectRatio: 1, alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
   day: { borderRadius: radius },
+  fieldError: { color: colors.expenseText, fontSize: 13, fontWeight: '600', marginTop: space.xs + 2 },
+  inputInvalid: { backgroundColor: tint(colors.expense, 0.04) },
   modalHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: space.md,
     paddingHorizontal: space.lg,
-    paddingBottom: space.md,
-    backgroundColor: colors.surface,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
+    paddingBottom: space.lg,
+    backgroundColor: colors.background,
   },
+  modalBadge: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.softAccent,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalTitle: { fontSize: 24, fontWeight: '800', color: colors.text, letterSpacing: -0.5 },
+  modalClose: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.softAccent,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalCloseText: { fontSize: 16, fontWeight: '800', color: colors.primaryDark },
   modalFooter: {
     flexDirection: 'row',
     gap: space.sm,
     paddingHorizontal: space.lg,
-    paddingTop: space.md,
+    paddingTop: space.lg,
     backgroundColor: colors.surface,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.border,
+    borderTopLeftRadius: radius * 2,
+    borderTopRightRadius: radius * 2,
+    ...Platform.select({
+      ios: { shadowColor: colors.primaryDark, shadowOpacity: 0.07, shadowRadius: 10, shadowOffset: { width: 0, height: -3 } },
+      default: { elevation: 3 },
+    }),
   },
 });

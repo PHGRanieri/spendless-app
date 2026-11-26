@@ -11,6 +11,8 @@ export const colors = {
   pending: '#D97706',
   /** Âmbar escuro SÓ para texto de pendente (contraste 6,25:1 sobre o tint de Mel). Aprovado pelo usuário. */
   pendingText: '#92400E',
+  /** Brasa escura SÓ para texto sobre o tint de Brasa (5,5:1): botão Excluir tonal e erros de campo. */
+  expenseText: '#B91C1C',
   surface: '#FFFFFF',
   border: '#E2E8F0',
 } as const;

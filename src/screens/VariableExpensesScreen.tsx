@@ -3,7 +3,7 @@ import { Text } from '../components/Text';
 import { useApp } from '../AppContext';
 import { animateNextLayout } from '../motion';
 import { EXPENSE_TYPES, PAYMENT_METHODS, PaymentMethod, paymentMethodLabel } from '../constants';
-import { shortDateLabel } from '../dates';
+import { monthLabel, shortDateLabel } from '../dates';
 import {
   addVariableExpense,
   deleteVariableExpense,
@@ -20,6 +20,7 @@ import { formatBRL } from '../money';
 import { colors, common, tints } from '../theme';
 import { ListLayout } from './ListLayout';
 import { defaultDate } from './formDefaults';
+import { clearError, FieldErrors, FieldKey, hasErrors, validateItemForm } from './validation';
 
 interface Form {
   id: number | null;
@@ -37,17 +38,21 @@ export function VariableExpensesScreen() {
   const { db, month, version, run } = useApp();
   const items = useMemo(() => listVariableExpenses(db, month), [db, month, version]);
   const [form, setForm] = useState<Form | null>(null);
+  const [errors, setErrors] = useState<FieldErrors>({});
   const editing = items.find((i) => i.id === form?.id) ?? null;
 
   const paid = items.filter((i) => i.paid).reduce((a, i) => a + i.amountCents, 0);
   const total = items.reduce((a, i) => a + i.amountCents, 0);
 
-  const openNew = () =>
+  const openNew = () => {
+    setErrors({});
     setForm({
       id: null, isInstallment: false, type: null, name: '', cents: 0, dueDate: defaultDate(month), note: '',
       method: 'pix', installments: '1',
     });
-  const openEdit = (v: VariableExpenseView) =>
+  };
+  const openEdit = (v: VariableExpenseView) => {
+    setErrors({});
     setForm({
       id: v.id,
       isInstallment: v.purchaseId != null,
@@ -59,12 +64,26 @@ export function VariableExpensesScreen() {
       method: v.paymentMethod,
       installments: String(v.installments ?? 1),
     });
+  };
+
+  /** Atualiza o formulário e apaga o erro do campo mexido. */
+  const edit = (patch: Partial<Form>, key?: FieldKey) => {
+    if (!form) return;
+    setForm({ ...form, ...patch });
+    if (key) setErrors((e) => clearError(e, key));
+  };
 
   const installmentsNum = form ? Number.parseInt(form.installments, 10) : NaN;
   const isCredit = form?.method === 'credito';
 
   const save = () => {
     if (!form) return;
+    const found = validateItemForm(form, {
+      isTotal: isCredit,
+      installments: isCredit ? (Number.isNaN(installmentsNum) ? 0 : installmentsNum) : undefined,
+    });
+    setErrors(found);
+    if (hasErrors(found)) return;
     const input = {
       type: form.type ?? '',
       name: form.name,
@@ -135,6 +154,9 @@ export function VariableExpensesScreen() {
         <FormModal
           visible
           title={form.id == null ? 'Novo gasto variável' : form.isInstallment ? `Editar ${displayName(editing!)}` : 'Editar gasto variável'}
+          subtitle={monthLabel(month)}
+          emoji="🛍️"
+          type={form.type}
           onClose={() => setForm(null)}
           footer={
             <>
@@ -143,28 +165,28 @@ export function VariableExpensesScreen() {
             </>
           }
         >
-          <Field label="Tipo">
-            <SelectField value={form.type} options={EXPENSE_TYPES} onChange={(type) => setForm({ ...form, type })} />
+          <Field label="Tipo" error={errors.type}>
+            <SelectField value={form.type} options={EXPENSE_TYPES} onChange={(type) => edit({ type }, 'type')} />
           </Field>
-          <Field label="Nome">
-            <TextField value={form.name} onChangeText={(name) => setForm({ ...form, name })} placeholder="Ex.: Mercado da semana" maxLength={80} />
+          <Field label="Nome" error={errors.name}>
+            <TextField value={form.name} onChangeText={(name) => edit({ name }, 'name')} placeholder="Ex.: Mercado da semana" maxLength={80} />
           </Field>
           <Field label="Forma de pagamento">
             <Segmented
               value={form.method}
               options={methodOptions}
-              onChange={(method) => setForm({ ...form, method })}
+              onChange={(method) => edit({ method }, 'installments')}
               disabled={form.isInstallment}
             />
           </Field>
-          <Field label={isCredit ? 'Valor total' : 'Valor'}>
-            <MoneyField cents={form.cents} onChange={(cents) => setForm({ ...form, cents })} />
+          <Field label={isCredit ? 'Valor total' : 'Valor'} error={errors.cents}>
+            <MoneyField cents={form.cents} onChange={(cents) => edit({ cents }, 'cents')} />
           </Field>
           {isCredit && (
-            <Field label="Quantidade de parcelas">
+            <Field label="Quantidade de parcelas" error={errors.installments}>
               <TextField
                 value={form.installments}
-                onChangeText={(t) => setForm({ ...form, installments: t.replace(/\D/g, '').slice(0, 3) })}
+                onChangeText={(t) => edit({ installments: t.replace(/\D/g, '').slice(0, 3) }, 'installments')}
                 keyboardType="number-pad"
                 maxLength={3}
               />
