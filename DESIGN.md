@@ -11,6 +11,7 @@ colors:
   ardosia: "#64748B"
   nevoa: "#E2E8F0"
   brasa: "#DC2626"
+  brasa-tostada: "#B91C1C"
   mel: "#D97706"
   mel-tostado: "#92400E"
 typography:
@@ -63,13 +64,13 @@ components:
     rounded: "{rounded.md}"
     padding: "14px 16px"
   button-secondary:
-    backgroundColor: "{colors.louca}"
+    backgroundColor: "{colors.orvalho}"
     textColor: "{colors.floresta}"
     rounded: "{rounded.md}"
     padding: "14px 16px"
   button-danger:
-    backgroundColor: "{colors.louca}"
-    textColor: "{colors.brasa}"
+    backgroundColor: "rgba(220,38,38,0.10)"
+    textColor: "{colors.brasa-tostada}"
     rounded: "{rounded.md}"
     padding: "14px 16px"
   status-pill-done:
@@ -149,7 +150,8 @@ Uma paleta de horta e cozinha: verdes que crescem, um âmbar de mel e um vermelh
 ### Secondary
 - **Mel** (#D97706): tudo que está pendente, como fundo (tint de 12% na pílula).
 - **Mel Tostado** (#92400E): só texto de pendente, sobre o tint de Mel (6,25:1). Aprovado como exceção à paleta original, por contraste.
-- **Brasa** (#DC2626): saídas e alerta. Valores de gastos, barra de pagos, selo "no vermelho" e botão Excluir. Nunca como fundo de tela inteira.
+- **Brasa** (#DC2626): saídas e alerta. Valores de gastos, barra de pagos, selo "no vermelho", borda de campo com erro e a confirmação final de exclusão. Nunca como fundo de tela inteira.
+- **Brasa Tostada** (#B91C1C): só texto sobre o tint de Brasa (5,5:1): botão Excluir tonal e mensagem de erro de campo. Exceção por contraste, como a Mel Tostado.
 
 ### Neutral
 - **Fundo Linho** (#F8FAF9): o fundo de todas as telas.
@@ -210,8 +212,9 @@ Duas formas: retângulo com cantos suaves de 12px (cartões, campos, botões, gr
 Macios e confiantes: ocupam a largura disponível e respondem ao toque encolhendo de leve.
 - **Shape:** cantos suaves (12px), 14px de altura interna.
 - **Primary:** fundo Floresta, texto Louça 16px peso 700.
-- **Secondary:** fundo Louça, borda Névoa de 1px, texto Floresta.
-- **Danger:** fundo Louça, borda e texto Brasa (Excluir).
+- **Secondary:** fundo Orvalho, sem borda, texto Floresta (ex.: "Cadastrar" do estado vazio).
+- **Danger:** tint de Brasa a 10%, sem borda, texto Brasa Tostada (Excluir). O vermelho cheio fica para a confirmação final, no diálogo: tocar → confirmar → vermelho.
+- **Nenhum botão de ação é só contorno.** Texto 16px peso 700.
 - **Toque:** encolhe para 97% em 120ms e volta em 160ms, com a curva `bezier(0.23, 1, 0.32, 1)`. Desabilitado: opacidade 0.5. Com Reduzir Movimento, troca a escala por opacidade 0.8.
 
 ### Status Pill (signature)
@@ -234,8 +237,12 @@ Círculo de emoji (40px), nome em 15px peso 700 e subtítulo Ardósia 12px ("Tip
 ### Type Badge (signature)
 Cada tipo de entrada ou gasto tem um emoji fixo dentro de um círculo com tint de 14% de uma das cores oficiais. Exemplos: 🛒 Mercado, 🏠 Contas de casa, 🐾 Pets. O mapa completo está em `src/typeIcons.ts`. Ele aparece nas linhas, na caixa de seleção de tipo e em "Para onde vai o dinheiro".
 
+### Form Sheet (cadastro e edição)
+Tela cheia sobre o linho. Cabeçalho sem divisória: a "etiqueta do pote" (círculo de 48px com o emoji do tipo escolhido, ou o da seção antes da escolha), título 24px peso 800, o mês em Ardósia embaixo e fechar como círculo Orvalho de 40px com ✕ Floresta. Rodapé fixo em Louça com cantos superiores de 24px e sombra ambiente voltada para cima, com Excluir tonal e Salvar Floresta.
+
 ### Inputs / Fields
-- **Style:** fundo Louça, borda Névoa de 1px, cantos de 12px, texto 16px.
+- **Style:** fundo Louça, borda Névoa de 1px, cantos de 12px, texto 16px. Em foco, borda Floresta.
+- **Erro:** a validação roda na tela antes de salvar e mostra todos os problemas de uma vez. Borda Brasa, fundo com 4% de Brasa e mensagem Brasa Tostada 13px peso 600 embaixo do campo; o erro some assim que o usuário mexe no campo.
 - **Valor em R$:** campo com máscara que preenche os centavos da direita para a esquerda, 20px peso 600 tabular.
 - **Caixa de seleção:** campo que abre uma lista em folha branca sobre véu de Tinta a 35%, com emoji em cada opção e ✓ na escolhida.
 - **Segmentado:** chips em pílula de no mínimo 44px de altura; o ativo fica com fundo Floresta e texto branco.
@@ -244,12 +251,17 @@ Cada tipo de entrada ou gasto tem um emoji fixo dentro de um círculo com tint d
 Trilha em pílula de 8–10px com tint da cor do status e preenchimento na cor cheia. Quando o valor muda dentro do mesmo mês, a largura anima em 240ms com a curva padrão. Ao montar ou trocar de mês, já aparece no lugar.
 
 ### Confirmation Dialog (signature)
-Substitui o alerta do sistema em toda confirmação: exclusões, escopo de fixos, importação e limite de 12 meses. Os avisos de erro continuam no alerta nativo.
+Substitui o alerta do sistema em toda confirmação e em todo aviso: exclusões, escopo de fixos, importação, limite de 12 meses, erros e sucesso (`notify` em `src/components/dialogs.ts`). O alerta nativo não aparece no app.
+- **Aviso de erro:** emoji 😕 em círculo com tint de Brasa, um botão primário "Entendi". **Sucesso:** 🎉 em Orvalho, botão "Ótimo".
 - **Forma:** cartão Louça com cantos de 24px, sombra ambiente leve, largura máxima de 420px, sobre véu de Tinta a 45%.
 - **Conteúdo:** emoji de 30px num círculo de 64px (tint de Brasa a 10% quando destrutivo, Orvalho quando neutro), título 20px peso 800 centralizado, mensagem Ardósia 15px.
-- **Ações:** empilhadas em largura total, 48px de altura: destrutiva cheia em Brasa com texto branco (4,83:1), destrutiva secundária com borda Brasa, primária Floresta, secundária com borda Névoa, "Cancelar" como texto Ardósia.
+- **Ações:** empilhadas em largura total, 48px de altura: destrutiva cheia em Brasa com texto branco (4,83:1), destrutiva secundária tonal (tint de Brasa, texto Brasa Tostada), primária Floresta, secundária tonal Orvalho, "Cancelar" como texto Ardósia.
 - **Movimento:** véu em fade e cartão de 96% para 100% em 220ms; sai em 140ms. Com Reduzir Movimento, só fade. O resultado é entregue depois que o diálogo fecha.
 - **Texto:** o título pergunta ("Excluir gasto?") e o botão nomeia a ação ("Excluir gasto"); a mensagem diz o que sai e que não pode ser desfeito.
+
+### Logo & Abertura
+- **Logo "Broto no $":** ladrilho Floresta (cantos de 22%), cifrão branco de traço arredondado e a haste brotando em duas folhas, Broto à direita e Orvalho à esquerda. Fontes em `assets/logo/` (`gen-logo.js` regera todos os PNGs).
+- **Abertura:** o splash nativo mostra o ladrilho sem as folhas, sobre o linho, com 160px. A camada JS (`src/components/Splash.tsx`) começa idêntica, as folhas brotam da ponta da haste (440ms, a esquerda 70ms depois), o wordmark sobe 8px com fade e a camada some em 200ms. Total ≈ 1,15s. Com Reduzir Movimento, tudo já está no lugar e só há o fade.
 
 ### Navigation
 Barra inferior branca com 5 abas: emoji + rótulo de 11px. A aba ativa ganha pílula Orvalho atrás do emoji e rótulo Floresta peso 800; as inativas ficam com o emoji a 55% e o rótulo Ardósia. Não há animação de troca de aba. O seletor de mês é uma pílula branca com setas em círculos Orvalho.

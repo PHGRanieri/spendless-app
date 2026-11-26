@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
 import type { EditScope } from '../domain/types';
 
-export type DialogActionStyle = 'primary' | 'secondary' | 'danger' | 'danger-outline' | 'cancel';
+export type DialogActionStyle = 'primary' | 'secondary' | 'danger' | 'danger-soft' | 'cancel';
 
 export interface DialogAction {
   key: string;
@@ -57,7 +57,7 @@ export async function askScope(action: 'editar' | 'excluir'): Promise<EditScope 
           title: 'Excluir item fixo',
           message: 'Este item se repete todo mês. De quais meses você quer excluir?',
           actions: [
-            { key: 'only_this', label: 'Só deste mês', style: 'danger-outline' },
+            { key: 'only_this', label: 'Só deste mês', style: 'danger-soft' },
             { key: 'this_and_next', label: 'Deste e dos próximos', style: 'danger' },
             { key: 'cancel', label: 'Cancelar', style: 'cancel' },
           ],
@@ -95,4 +95,18 @@ export async function confirm(
     ],
   });
   return key === 'ok';
+}
+
+/**
+ * Aviso de um botão só, no diálogo da marca (substitui o Alert do sistema).
+ * 'error': algo não deu certo e nada foi alterado; 'success': deu certo.
+ */
+export async function notify(kind: 'error' | 'success', title: string, message: string): Promise<void> {
+  await showDialog({
+    emoji: kind === 'error' ? '😕' : '🎉',
+    tone: kind === 'error' ? 'danger' : 'neutral',
+    title,
+    message,
+    actions: [{ key: 'ok', label: kind === 'error' ? 'Entendi' : 'Ótimo', style: 'primary' }],
+  });
 }

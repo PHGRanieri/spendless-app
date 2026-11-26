@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../components/Text';
 import { errorMessage, useApp } from '../AppContext';
 import { importBackup, summarizeBackup } from '../domain/backup';
 import { monthShortLabel } from '../dates';
 import { pickBackup, shareExport } from '../services/backupIO';
-import { confirm } from '../components/dialogs';
+import { confirm, notify } from '../components/dialogs';
 import { Button } from '../components/ui';
 import { common, space, tints } from '../theme';
 import { MAX_MONTHS } from '../constants';
@@ -19,7 +19,7 @@ export function SettingsScreen() {
     try {
       await shareExport(db);
     } catch (e) {
-      Alert.alert('Não foi possível exportar', errorMessage(e));
+      await notify('error', 'Não foi possível exportar', errorMessage(e));
     } finally {
       setBusy(false);
     }
@@ -43,9 +43,9 @@ export function SettingsScreen() {
       if (!ok) return;
       importBackup(db, backup); // uma única transação: falhou = nada muda
       refresh();
-      Alert.alert('Importação concluída', 'Os dados do arquivo foram restaurados.');
+      await notify('success', 'Importação concluída', 'Os dados do arquivo foram restaurados.');
     } catch (e) {
-      Alert.alert('Importação cancelada', `${errorMessage(e)}\n\nSeus dados atuais não foram alterados.`);
+      await notify('error', 'Importação cancelada', `${errorMessage(e)}\n\nSeus dados atuais não foram alterados.`);
     } finally {
       setBusy(false);
     }

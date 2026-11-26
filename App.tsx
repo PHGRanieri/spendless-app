@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, AppState, StyleSheet, View } from 'react-native';
+import { AppState, StyleSheet, View } from 'react-native';
 import { Text } from './src/components/Text';
 import { StatusBar } from 'expo-status-bar';
+import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { FONT_FILES, setFontsReady } from './src/fonts';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -14,7 +15,8 @@ import { monthLabel } from './src/dates';
 import { shareExport } from './src/services/backupIO';
 import { Header } from './src/components/Header';
 import { DialogHost } from './src/components/DialogHost';
-import { showDialog } from './src/components/dialogs';
+import { Splash } from './src/components/Splash';
+import { notify, showDialog } from './src/components/dialogs';
 import { TabBar, TabKey } from './src/components/TabBar';
 import { SummaryScreen } from './src/screens/SummaryScreen';
 import { IncomesScreen } from './src/screens/IncomesScreen';
@@ -22,6 +24,9 @@ import { FixedExpensesScreen } from './src/screens/FixedExpensesScreen';
 import { VariableExpensesScreen } from './src/screens/VariableExpensesScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { colors, space } from './src/theme';
+
+// O splash nativo fica até a abertura em JS assumir (ela chama hideAsync no 1º layout).
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 type Opened = { db: Db; error: null } | { db: null; error: string };
 
@@ -38,6 +43,7 @@ function openDb(): Opened {
 export default function App() {
   const [opened] = useState(openDb);
   const [fontsLoaded, fontError] = useFonts(FONT_FILES);
+  const [splashDone, setSplashDone] = useState(false);
   // Se a fonte falhar, o app segue com a fonte do sistema (nunca bloqueia o acesso aos dados).
   setFontsReady(fontsLoaded && !fontError);
   if (!fontsLoaded && !fontError) return <View style={styles.root} />;
@@ -55,6 +61,7 @@ export default function App() {
           <Text style={styles.errorText}>{opened.error}</Text>
         </SafeAreaView>
       )}
+      {!splashDone && <Splash onDone={() => setSplashDone(true)} />}
     </SafeAreaProvider>
   );
 }
@@ -91,7 +98,7 @@ function Main() {
             `${removing} será removido com todos os itens.\n\nQuer exportar seus dados antes?`,
           actions: [
             { key: 'export', label: 'Exportar antes', style: 'primary' },
-            { key: 'remove', label: `Remover ${removing} e criar`, style: 'danger-outline' },
+            { key: 'remove', label: `Remover ${removing} e criar`, style: 'danger-soft' },
             { key: 'cancel', label: 'Agora não', style: 'cancel' },
           ],
         });
@@ -99,7 +106,7 @@ function Main() {
           try {
             await shareExport(db);
           } catch (e) {
-            Alert.alert('Não foi possível exportar', errorMessage(e));
+            await notify('error', 'Não foi possível exportar', errorMessage(e));
           }
           return ask(); // volta a perguntar depois de exportar
         }
@@ -109,7 +116,7 @@ function Main() {
           const r = createMonth(db, month, origin, { now: new Date(), confirmRemoval: true });
           handleCreate(month, origin, r);
         } catch (e) {
-          Alert.alert('Não foi possível criar o mês', errorMessage(e));
+          void notify('error', 'Não foi possível criar o mês', errorMessage(e));
         }
       };
       void ask();
@@ -125,7 +132,7 @@ function Main() {
         const r = runAutoCreate(db, now);
         if (r) handleCreate(r.month, 'auto', r);
       } catch (e) {
-        Alert.alert('Não foi possível criar o próximo mês', errorMessage(e));
+        void notify('error', 'Não foi possível criar o próximo mês', errorMessage(e));
       }
     };
     check();
@@ -137,7 +144,7 @@ function Main() {
     try {
       handleCreate(month, 'manual', createMonth(db, month, 'manual', { now: new Date() }));
     } catch (e) {
-      Alert.alert('Não foi possível criar o mês', errorMessage(e));
+      void notify('error', 'Não foi possível criar o mês', errorMessage(e));
     }
   };
 

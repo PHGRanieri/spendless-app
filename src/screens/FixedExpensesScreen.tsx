@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useApp } from '../AppContext';
 import { animateNextLayout } from '../motion';
 import { EXPENSE_TYPES } from '../constants';
-import { shortDateLabel } from '../dates';
+import { monthLabel, shortDateLabel } from '../dates';
 import { addFixedExpense, deleteFixedExpense, toggleFixedExpensePaid, updateFixedExpense } from '../domain/items';
 import { listFixedExpenses } from '../domain/repo';
 import type { FixedExpense } from '../domain/types';
@@ -12,6 +12,7 @@ import { Button, DayGrid, Field, FormModal, MoneyField, SelectField, TextField }
 import { colors, tints } from '../theme';
 import { ListLayout } from './ListLayout';
 import { defaultDate } from './formDefaults';
+import { clearError, FieldErrors, FieldKey, hasErrors, validateItemForm } from './validation';
 
 interface Form {
   id: number | null;
@@ -26,16 +27,32 @@ export function FixedExpensesScreen() {
   const { db, month, version, run } = useApp();
   const items = useMemo(() => listFixedExpenses(db, month), [db, month, version]);
   const [form, setForm] = useState<Form | null>(null);
+  const [errors, setErrors] = useState<FieldErrors>({});
+
+  /** Atualiza o formulário e apaga o erro do campo mexido. */
+  const edit = (patch: Partial<Form>, key?: FieldKey) => {
+    if (!form) return;
+    setForm({ ...form, ...patch });
+    if (key) setErrors((e) => clearError(e, key));
+  };
 
   const paid = items.filter((i) => i.paid).reduce((a, i) => a + i.amountCents, 0);
   const total = items.reduce((a, i) => a + i.amountCents, 0);
 
-  const openNew = () => setForm({ id: null, type: null, name: '', cents: 0, dueDate: defaultDate(month), note: '' });
-  const openEdit = (f: FixedExpense) =>
+  const openNew = () => {
+    setErrors({});
+    setForm({ id: null, type: null, name: '', cents: 0, dueDate: defaultDate(month), note: '' });
+  };
+  const openEdit = (f: FixedExpense) => {
+    setErrors({});
     setForm({ id: f.id, type: f.type, name: f.name, cents: f.amountCents, dueDate: f.dueDate, note: f.note ?? '' });
+  };
 
   const save = async () => {
     if (!form) return;
+    const found = validateItemForm(form);
+    setErrors(found);
+    if (hasErrors(found)) return;
     const input = { type: form.type ?? '', name: form.name, amountCents: form.cents, dueDate: form.dueDate, note: form.note };
     if (form.id == null) {
       if (run(() => { addFixedExpense(db, month, input); animateNextLayout(); })) setForm(null);
@@ -89,6 +106,9 @@ export function FixedExpensesScreen() {
         <FormModal
           visible
           title={form.id == null ? 'Novo gasto fixo' : 'Editar gasto fixo'}
+          subtitle={monthLabel(month)}
+          emoji="📌"
+          type={form.type}
           onClose={() => setForm(null)}
           footer={
             <>
@@ -97,14 +117,14 @@ export function FixedExpensesScreen() {
             </>
           }
         >
-          <Field label="Tipo">
-            <SelectField value={form.type} options={EXPENSE_TYPES} onChange={(type) => setForm({ ...form, type })} />
+          <Field label="Tipo" error={errors.type}>
+            <SelectField value={form.type} options={EXPENSE_TYPES} onChange={(type) => edit({ type }, 'type')} />
           </Field>
-          <Field label="Nome">
-            <TextField value={form.name} onChangeText={(name) => setForm({ ...form, name })} placeholder="Ex.: Aluguel" maxLength={80} />
+          <Field label="Nome" error={errors.name}>
+            <TextField value={form.name} onChangeText={(name) => edit({ name }, 'name')} placeholder="Ex.: Aluguel" maxLength={80} />
           </Field>
-          <Field label="Valor">
-            <MoneyField cents={form.cents} onChange={(cents) => setForm({ ...form, cents })} />
+          <Field label="Valor" error={errors.cents}>
+            <MoneyField cents={form.cents} onChange={(cents) => edit({ cents }, 'cents')} />
           </Field>
           <Field label="Vencimento">
             <DayGrid month={month} value={form.dueDate} onChange={(dueDate) => setForm({ ...form, dueDate })} />
